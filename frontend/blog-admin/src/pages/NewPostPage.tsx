@@ -42,6 +42,7 @@ const NewPostPage = () => {
         title: title,
         contentMarkdown: content,
         tags: tagsArray,
+        previewImageUrl: previewUrl.trim(),
       }),
     });
 
@@ -94,6 +95,52 @@ const NewPostPage = () => {
     setContent('');
     setTagsInput('');
     setFiles(null);
+  };
+
+  const handlePreviewUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 🔍 Проверка MIME-типа
+    if (!file.type.startsWith("image/")) {
+      alert("Можно загружать только изображения");
+      return;
+    }
+
+    // 🧹 Удаление предыдущего preview, если был
+    if (previewUrl) {
+      try {
+        const deleteUrl = `${API_BASE}/attachments?url=` + encodeURIComponent(previewUrl);
+        await fetch(deleteUrl, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        });
+      } catch (err) {
+        console.warn("Ошибка при удалении старого preview", err);
+      }
+    }
+
+    // ⬆ Загрузка нового файла
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch(`${API_BASE}/attachments`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      },
+      body: formData
+    });
+
+    if (!res.ok) {
+      alert("Не удалось загрузить изображение");
+      return;
+    }
+
+    const json = await res.json();
+    setPreviewUrl(json.url);
   };
 
   return (
