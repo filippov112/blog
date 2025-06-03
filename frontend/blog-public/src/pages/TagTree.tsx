@@ -5,7 +5,6 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL;
 type TagNode = {
   id: number;
   name: string;
-  path: string;
   children: TagNode[];
 };
 
@@ -18,12 +17,12 @@ const TagTree = () => {
       .then(data => setTree(data));
   }, []);
 
-  const renderNode = (node: TagNode) => (
+  const renderNode = (node: TagNode, pref: string) => (
     <li key={node.id}>
-      <Link to={`/tag/${encodeURIComponent(node.path)}`}>{node.name}</Link>
+      <Link to={`/tag/${pref}${encodeURIComponent(node.name)}`}>{node.name}</Link>
       {node.children?.length > 0 && (
         <ul>
-          {node.children.map(child => renderNode(child))}
+          {node.children.map(child => renderNode(child, node.name + `/`))}
         </ul>
       )}
     </li>
@@ -33,7 +32,7 @@ const TagTree = () => {
     <div>
       <h3>Навигация по тегам</h3>
       <ul>
-        {tree.map(node => renderNode(node))}
+        {tree.map(node => renderNode(node, ""))}
       </ul>
     </div>
   );
