@@ -8,6 +8,8 @@ const NewPostPage = () => {
   const [content, setContent] = useState('');
   const [tagsInput, setTagsInput] = useState('');
   const [files, setFiles] = useState<FileList | null>(null);
+  const [coverImage, setCoverImage] = useState<File | null>(null);
+
   const navigate = useNavigate();
 
   const token = localStorage.getItem('token');
@@ -16,6 +18,10 @@ const NewPostPage = () => {
     if (!token) {
       alert('Требуется авторизация');
       navigate('/login');
+      return;
+    }
+    if (!title.trim() || !content.trim()) {
+      alert('Заголовок и содержимое обязательны');
       return;
     }
 
@@ -46,7 +52,24 @@ const NewPostPage = () => {
 
     const { id } = await res.json();
 
-    // 2. Загрузка вложений
+    // 2. Загрузка обложки
+    if (coverImage) {
+      const formData = new FormData();
+      formData.append('file', coverImage);
+      const resCover = await fetch(`${API_BASE}/Attachment/cover/${id}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+      if (!resCover.ok) {
+        alert('Ошибка загрузки обложки');
+        return;
+      }
+    }
+
+    // 3. Загрузка вложений
     if (files && files.length > 0) {
       const formData = new FormData();
       for (let i = 0; i < files.length; i++) {
@@ -88,6 +111,12 @@ const NewPostPage = () => {
         onChange={(e) => setContent(e.target.value)}
         rows={10}
         style={{ width: '100%', marginBottom: '0.5rem' }}
+      />
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => setCoverImage(e.target.files?.[0] || null)}
+        style={{ marginBottom: '1rem' }}
       />
       <input
         placeholder="Теги через запятую (например: #Новости#Спорт#Футбол, #Погода)"

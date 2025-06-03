@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace blog.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250602164437_first_migration")]
-    partial class first_migration
+    [Migration("20250603212735_Add")]
+    partial class Add
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,6 +55,9 @@ namespace blog.Migrations
 
                     b.Property<string>("ContentMarkdown")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CoverImageUrl")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedAt")

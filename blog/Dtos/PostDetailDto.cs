@@ -4,5 +4,7 @@
     {
         public string ContentMarkdown { get; set; } = null!;
         public List<AttachmentDto> Attachments { get; set; } = new();
+        public string? CoverImageUrl { get; set; }
+
     }
 }

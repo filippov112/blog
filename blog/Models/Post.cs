@@ -11,4 +11,6 @@ public class Post
 
     public List<PostTag> PostTags { get; set; } = new();
     public List<Attachment> Attachments { get; set; } = new();
+    public string? CoverImageUrl { get; set; }
+
 }

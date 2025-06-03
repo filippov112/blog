@@ -58,7 +58,8 @@ namespace blog.Controllers
                     FileName = a.FileName,
                     FileType = a.FileType,
                     Url = a.DropboxPath
-                }).ToList()
+                }).ToList(),
+                CoverImageUrl = post.CoverImageUrl,
             };
 
             return Ok(dto);

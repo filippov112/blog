@@ -14,6 +14,7 @@ type Post = {
   title: string;
   contentMarkdown: string;
   attachments: Attachment[];
+  coverImageUrl?: string;
 };
 
 
@@ -31,6 +32,13 @@ const PostPage = () => {
 
   return (
     <div style={{ padding: '2rem' }}>
+      {post.coverImageUrl && (
+        <img
+          src={post.coverImageUrl}
+          alt="Обложка"
+          style={{ maxWidth: '100%', marginBottom: '1rem' }}
+        />
+      )}
       <h2>{post.title}</h2>
       <ReactMarkdown>{post.contentMarkdown}</ReactMarkdown>
       <h3>Вложения:</h3>

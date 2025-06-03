@@ -14,7 +14,7 @@ namespace blog.Services
         {
             var token = Env.GetString("DROPBOX_ACCESS_TOKEN")!;
             _rootPath = "/" + Env.GetString("ATTACHMENT_ROOTPATH").Trim('/') ?? "/";
-            _client = new DropboxClient(oauth2AccessToken: token, oauth2AccessTokenExpiresAt: DateTime.MaxValue);
+            _client = new DropboxClient(token);
         }
 
         public async Task<string> UploadAsync(Stream fileStream, string fileName, string postId)

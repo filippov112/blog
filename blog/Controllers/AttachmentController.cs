@@ -61,6 +61,23 @@ namespace blog.Controllers
             return Ok(uploaded);
         }
 
+        [HttpPost("cover/{postId}")]
+        public async Task<IActionResult> UploadCoverImage(int postId, [FromForm] IFormFile file)
+        {
+            if (!file.ContentType.StartsWith("image/"))
+                return BadRequest("Только изображения допустимы для обложки");
+
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == postId && p.UserId == userId);
+            if (post == null) return NotFound();
+
+            await using var stream = file.OpenReadStream();
+            var url = await _dropbox.UploadAsync(stream, file.FileName, $"cover-{postId}");
+
+            post.CoverImageUrl = url;
+            await _context.SaveChangesAsync();
+            return Ok(new { url });
+        }
     }
 
 }
