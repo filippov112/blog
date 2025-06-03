@@ -5,6 +5,7 @@ public class Post
     public string Title { get; set; } = null!;
     public string ContentMarkdown { get; set; } = null!;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public string PreviewImageUrl { get; set; } = null!; 
 
     public int UserId { get; set; }
     public User User { get; set; } = null!;

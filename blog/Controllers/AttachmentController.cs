@@ -1,4 +1,5 @@
 ﻿using blog.Services;
+using DotNetEnv;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -61,22 +62,31 @@ namespace blog.Controllers
             return Ok(uploaded);
         }
 
-        [HttpPost("cover/{postId}")]
-        public async Task<IActionResult> UploadCoverImage(int postId, [FromForm] IFormFile file)
+        [Authorize]
+        [HttpDelete]
+        public IActionResult Delete([FromQuery] string url)
         {
-            if (!file.ContentType.StartsWith("image/"))
-                return BadRequest("Только изображения допустимы для обложки");
+            if (string.IsNullOrWhiteSpace(url))
+                return BadRequest("URL не указан");
 
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == postId && p.UserId == userId);
-            if (post == null) return NotFound();
+            // 🧠 Извлечение имени файла из URL
+            var fileName = Path.GetFileName(new Uri(url).AbsolutePath);
 
-            await using var stream = file.OpenReadStream();
-            var url = await _dropbox.UploadAsync(stream, file.FileName, $"cover-{postId}");
+            var uploadsPath = Path.Combine("/" + Env.GetString("ATTACHMENT_ROOTPATH").Trim('/') ?? "/", "Uploads");
+            var filePath = Path.Combine(uploadsPath, fileName);
 
-            post.CoverImageUrl = url;
-            await _context.SaveChangesAsync();
-            return Ok(new { url });
+            if (!System.IO.File.Exists(filePath))
+                return NotFound("Файл не найден");
+
+            try
+            {
+                System.IO.File.Delete(filePath);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ошибка при удалении файла: {ex.Message}");
+            }
         }
     }
 

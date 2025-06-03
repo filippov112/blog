@@ -1,4 +1,5 @@
 ﻿using blog.Dtos;
+using DotNetEnv;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,17 +24,24 @@ namespace blog.Controllers
         public async Task<IActionResult> CreatePost([FromBody] CreatePostDto dto)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            
+            if (string.IsNullOrWhiteSpace(dto.Title) || string.IsNullOrWhiteSpace(dto.ContentMarkdown))
+                return BadRequest("Заголовок и содержимое обязательны");
+
+            var preview = string.IsNullOrWhiteSpace(dto.PreviewImageUrl)
+                ? Env.GetString("DEFAULT_PREVIEW_IMAGE_URL") ?? ""
+                : dto.PreviewImageUrl;
 
             var post = new Post
             {
                 Title = dto.Title,
                 ContentMarkdown = dto.ContentMarkdown,
-                UserId = userId
+                UserId = userId,
+                PreviewImageUrl = preview
             };
 
             var tags = await ParseAndEnsureTagsAsync(dto.Tags);
             post.PostTags = tags.Select(t => new PostTag { Post = post, Tag = t }).ToList();
-
             _context.Posts.Add(post);
             await _context.SaveChangesAsync();
 
