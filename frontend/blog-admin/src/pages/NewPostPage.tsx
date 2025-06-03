@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 const NewPostPage = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [tags, setTags] = useState('');
+  const [tagsInput, setTagsInput] = useState('');
   const [files, setFiles] = useState<FileList | null>(null);
   const navigate = useNavigate();
 
@@ -18,7 +19,13 @@ const NewPostPage = () => {
       return;
     }
 
-    // 1. Отправляем пост
+    // Преобразование строки тегов в массив строк
+    const tagsArray = tagsInput
+      .split(',')
+      .map(tag => tag.trim())
+      .filter(tag => tag.length > 0);
+
+    // 1. Отправка поста
     const res = await fetch(`${API_BASE}/Post`, {
       method: 'POST',
       headers: {
@@ -28,7 +35,7 @@ const NewPostPage = () => {
       body: JSON.stringify({
         title: title,
         contentMarkdown: content,
-        tags: tags,
+        tags: tagsArray,
       }),
     });
 
@@ -39,13 +46,12 @@ const NewPostPage = () => {
 
     const { id } = await res.json();
 
-    // 2. Отправляем вложения
+    // 2. Загрузка вложений
     if (files && files.length > 0) {
       const formData = new FormData();
       for (let i = 0; i < files.length; i++) {
-        formData.append('file', files[i]);
+        formData.append('files', files[i]);
       }
-
       const uploadRes = await fetch(`${API_BASE}/Attachment/${id}`, {
         method: 'POST',
         headers: {
@@ -63,7 +69,7 @@ const NewPostPage = () => {
     alert('Пост создан');
     setTitle('');
     setContent('');
-    setTags('');
+    setTagsInput('');
     setFiles(null);
   };
 
@@ -84,9 +90,9 @@ const NewPostPage = () => {
         style={{ width: '100%', marginBottom: '0.5rem' }}
       />
       <input
-        placeholder="Теги (например: Новости#Спорт#Футбол)"
-        value={tags}
-        onChange={(e) => setTags(e.target.value)}
+        placeholder="Теги через запятую (например: #Новости#Спорт#Футбол, #Погода)"
+        value={tagsInput}
+        onChange={(e) => setTagsInput(e.target.value)}
         style={{ width: '100%', marginBottom: '0.5rem' }}
       />
       <input

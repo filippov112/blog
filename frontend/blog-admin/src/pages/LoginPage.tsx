@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 const LoginPage = () => {
@@ -38,7 +38,10 @@ const LoginPage = () => {
         value={password}
         onChange={e => setPassword(e.target.value)}
       /><br />
-      <button onClick={handleLogin}>Войти</button>
+      <div>
+        <button onClick={handleLogin}>Войти</button><br />
+        <Link to="/register">Нет аккаунта? Зарегистрироваться</Link>
+      </div>
     </div>
   );
 };

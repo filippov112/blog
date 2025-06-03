@@ -22,7 +22,7 @@ namespace blog.Controllers
         }
 
         [HttpPost("{postId}")]
-        public async Task<IActionResult> UploadAttachment(int postId, [FromForm] IFormFile file)
+        public async Task<IActionResult> UploadAttachment(int postId, [FromForm] List<IFormFile> files)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
@@ -32,22 +32,35 @@ namespace blog.Controllers
             if (post == null)
                 return NotFound("Пост не найден или не принадлежит текущему пользователю");
 
-            await using var stream = file.OpenReadStream();
-            var url = await _dropbox.UploadAsync(stream, file.FileName, postId.ToString());
+            var uploaded = new List<object>();
 
-            var attachment = new Attachment
+            foreach (var file in files)
             {
-                FileName = file.FileName,
-                DropboxPath = url,
-                FileType = file.ContentType,
-                PostId = postId
-            };
+                await using var stream = file.OpenReadStream();
+                var url = await _dropbox.UploadAsync(stream, file.FileName, postId.ToString());
 
-            _context.Attachments.Add(attachment);
+                var attachment = new Attachment
+                {
+                    FileName = file.FileName,
+                    DropboxPath = url,
+                    FileType = file.ContentType,
+                    PostId = postId
+                };
+
+                _context.Attachments.Add(attachment);
+                uploaded.Add(new
+                {
+                    attachment.Id,
+                    attachment.FileName,
+                    attachment.FileType,
+                    attachment.DropboxPath
+                });
+            }
+
             await _context.SaveChangesAsync();
-
-            return Ok(new { attachment.Id, attachment.FileName, attachment.FileType, attachment.DropboxPath });
+            return Ok(uploaded);
         }
+
     }
 
 }

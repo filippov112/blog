@@ -106,4 +106,4 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.Run();
+app.Run("http://localhost:5026");

@@ -13,7 +13,7 @@ namespace blog.Services
         public DropboxService()
         {
             var token = Env.GetString("DROPBOX_ACCESS_TOKEN")!;
-            _rootPath = Env.GetString("ATTACHMENT_ROOTPATH") ?? "/";
+            _rootPath = "/" + Env.GetString("ATTACHMENT_ROOTPATH").Trim('/') ?? "/";
             _client = new DropboxClient(oauth2AccessToken: token, oauth2AccessTokenExpiresAt: DateTime.MaxValue);
         }
 
