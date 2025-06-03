@@ -13,6 +13,7 @@ type Post = {
   id: number;
   title: string;
   contentMarkdown: string;
+  previewImageUrl: string;
   attachments: Attachment[];
 };
 
@@ -32,6 +33,11 @@ const PostPage = () => {
   return (
     <div style={{ padding: '2rem' }}>
       <h2>{post.title}</h2>
+      <img
+        src={post.previewImageUrl}
+        alt="preview"
+        style={{ width: '100%', maxHeight: '300px', objectFit: 'cover', marginBottom: '1rem' }}
+      />
       <ReactMarkdown>{post.contentMarkdown}</ReactMarkdown>
       <h3>Вложения:</h3>
       <ul>

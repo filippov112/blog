@@ -28,6 +28,7 @@ namespace blog.Controllers
                     Id = p.Id,
                     Title = p.Title,
                     CreatedAt = p.CreatedAt,
+                    PreviewImageUrl = p.PreviewImageUrl,
                     Tags = p.PostTags.Select(pt => pt.Tag.Name).ToList()
                 })
                 .ToListAsync();
@@ -96,6 +97,7 @@ namespace blog.Controllers
                     Id = pt.Post.Id,
                     Title = pt.Post.Title,
                     CreatedAt = pt.Post.CreatedAt,
+                    PreviewImageUrl = pt.Post.PreviewImageUrl,
                     Tags = pt.Post.PostTags.Select(x => x.Tag.Name).ToList()
                 })
                 .ToListAsync();
@@ -146,6 +148,7 @@ namespace blog.Controllers
                                     Id = pt.Post.Id,
                                     Title = pt.Post.Title,
                                     CreatedAt = pt.Post.CreatedAt,
+                                    PreviewImageUrl = pt.Post.PreviewImageUrl,
                                     Tags = pt.Post.PostTags.Select(x => x.Tag.Name).ToList()
                                 }).ToListAsync();
                 return Ok(posts);

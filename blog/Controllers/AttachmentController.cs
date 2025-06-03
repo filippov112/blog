@@ -1,4 +1,5 @@
 ﻿using blog.Services;
+using DotNetEnv;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -61,6 +62,32 @@ namespace blog.Controllers
             return Ok(uploaded);
         }
 
+        [Authorize]
+        [HttpDelete]
+        public IActionResult Delete([FromQuery] string url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+                return BadRequest("URL не указан");
+
+            // 🧠 Извлечение имени файла из URL
+            var fileName = Path.GetFileName(new Uri(url).AbsolutePath);
+
+            var uploadsPath = Path.Combine("/" + Env.GetString("ATTACHMENT_ROOTPATH").Trim('/') ?? "/", "Uploads");
+            var filePath = Path.Combine(uploadsPath, fileName);
+
+            if (!System.IO.File.Exists(filePath))
+                return NotFound("Файл не найден");
+
+            try
+            {
+                System.IO.File.Delete(filePath);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ошибка при удалении файла: {ex.Message}");
+            }
+        }
     }
 
 }

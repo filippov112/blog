@@ -7,6 +7,7 @@ type Post = {
   id: number;
   title: string;
   createdAt: string;
+  previewImageUrl: string;
 };
 
 const HomePage = () => {
@@ -30,6 +31,11 @@ const HomePage = () => {
           <li key={post.id}>
             <Link to={`/post/${post.id}`}>{post.title}</Link>
             <div style={{ fontSize: '0.9em', color: '#666' }}>{post.createdAt}</div>
+            <img
+              src={post.previewImageUrl}
+              alt="preview"
+              style={{ width: '100px', height: 'auto', marginRight: '1rem' }}
+            />
           </li>
         ))}
       </ul>

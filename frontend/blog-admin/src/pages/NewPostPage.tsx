@@ -8,6 +8,8 @@ const NewPostPage = () => {
   const [content, setContent] = useState('');
   const [tagsInput, setTagsInput] = useState('');
   const [files, setFiles] = useState<FileList | null>(null);
+  const [previewUrl, setPreviewUrl] = useState('');
+
   const navigate = useNavigate();
 
   const token = localStorage.getItem('token');
@@ -16,6 +18,11 @@ const NewPostPage = () => {
     if (!token) {
       alert('Требуется авторизация');
       navigate('/login');
+      return;
+    }
+
+    if (!title.trim() || !content.trim()) {
+      alert('Заголовок и содержимое обязательны');
       return;
     }
 
@@ -36,6 +43,7 @@ const NewPostPage = () => {
         title: title,
         contentMarkdown: content,
         tags: tagsArray,
+        previewImageUrl: previewUrl.trim(),
       }),
     });
 
@@ -73,6 +81,52 @@ const NewPostPage = () => {
     setFiles(null);
   };
 
+  const handlePreviewUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 🔍 Проверка MIME-типа
+    if (!file.type.startsWith("image/")) {
+      alert("Можно загружать только изображения");
+      return;
+    }
+
+    // 🧹 Удаление предыдущего preview, если был
+    if (previewUrl) {
+      try {
+        const deleteUrl = `${API_BASE}/attachments?url=` + encodeURIComponent(previewUrl);
+        await fetch(deleteUrl, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        });
+      } catch (err) {
+        console.warn("Ошибка при удалении старого preview", err);
+      }
+    }
+
+    // ⬆ Загрузка нового файла
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch(`${API_BASE}/attachments`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      },
+      body: formData
+    });
+
+    if (!res.ok) {
+      alert("Не удалось загрузить изображение");
+      return;
+    }
+
+    const json = await res.json();
+    setPreviewUrl(json.url);
+  };
+
   return (
     <div style={{ padding: '2rem' }}>
       <h2>Новый пост</h2>
@@ -89,6 +143,47 @@ const NewPostPage = () => {
         rows={10}
         style={{ width: '100%', marginBottom: '0.5rem' }}
       />
+      <input
+        placeholder="URL preview-изображения"
+        value={previewUrl}
+        readOnly
+        style={{ width: '100%', marginBottom: '0.5rem', background: '#eee' }}
+      />
+      {
+        previewUrl && (
+          <img
+            src={previewUrl}
+            alt="preview"
+            style={{ width: '200px', marginTop: '0.5rem' }}
+          />
+        )
+      }
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handlePreviewUpload}
+      />
+      {
+        previewUrl && (
+          <div style={{ marginTop: "0.5rem" }}>
+            <img src={previewUrl} alt="preview" style={{ width: "200px", display: "block" }} />
+            <button
+              onClick={async () => {
+                const deleteUrl = `${API_BASE}/attachments?url=` + encodeURIComponent(previewUrl);
+                await fetch(deleteUrl, {
+                  method: "DELETE",
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                  }
+                });
+                setPreviewUrl("");
+              }}
+            >
+              Удалить preview
+            </button>
+          </div>
+        )
+      }
       <input
         placeholder="Теги через запятую (например: #Новости#Спорт#Футбол, #Погода)"
         value={tagsInput}
