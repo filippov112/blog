@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 type TagNode = {
   id: number;
@@ -12,7 +13,7 @@ const TagTree = () => {
   const [tree, setTree] = useState<TagNode[]>([]);
 
   useEffect(() => {
-    fetch('https://localhost:7284/api/Public/tags')
+    fetch(`${API_BASE}/Public/tags`)
       .then(res => res.json())
       .then(data => setTree(data));
   }, []);

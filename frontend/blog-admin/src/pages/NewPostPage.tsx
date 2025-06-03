@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 const NewPostPage = () => {
   const [title, setTitle] = useState('');
@@ -18,7 +19,7 @@ const NewPostPage = () => {
     }
 
     // 1. Отправляем пост
-    const res = await fetch('https://localhost:7284/api/Post', {
+    const res = await fetch(`${API_BASE}/Post`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -45,7 +46,7 @@ const NewPostPage = () => {
         formData.append('file', files[i]);
       }
 
-      const uploadRes = await fetch(`https://localhost:7284/api/Attachment/${id}`, {
+      const uploadRes = await fetch(`${API_BASE}/Attachment/${id}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

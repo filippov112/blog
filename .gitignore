@@ -1,5 +1,5 @@
-blog/.env
 blog/API.txt
 blog/bin/
 blog/obj/
 .vs/
+/**/.env

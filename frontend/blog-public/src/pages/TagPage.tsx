@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 type Post = {
   id: number;
@@ -13,7 +14,7 @@ const TagPage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
-    fetch(`https://localhost:7284/api/Public/posts/bypath?path=${path}`)
+    fetch(`${API_BASE}/Public/posts/bypath?path=${path}`)
       .then(res => res.json())
       .then(data => setPosts(data));
   }, [path]);

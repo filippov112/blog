@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 type Post = {
   id: number;
@@ -14,7 +15,7 @@ const PostPage = () => {
   const [post, setPost] = useState<Post | null>(null);
 
   useEffect(() => {
-    fetch(`https://localhost:7284/api/Public/posts/${id}`)
+    fetch(`${API_BASE}/Public/posts/${id}`)
       .then(res => res.json())
       .then(data => setPost(data));
   }, [id]);

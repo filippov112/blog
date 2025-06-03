@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import TagTree from './TagTree';
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 type Post = {
   id: number;
@@ -12,7 +13,7 @@ const HomePage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
-    fetch('https://localhost:7284/api/Public/posts?count=10')
+    fetch(`${API_BASE}/Public/posts?count=10`)
       .then(res => res.json())
       .then(data => setPosts(data));
   }, []);
