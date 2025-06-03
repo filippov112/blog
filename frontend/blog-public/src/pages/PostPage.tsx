@@ -3,12 +3,19 @@ import { useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
+type Attachment = {
+  fileName: string;
+  fileType: string;
+  url: string;
+};
+
 type Post = {
   id: number;
   title: string;
   contentMarkdown: string;
-  attachments: string[]; // URL'ы файлов
+  attachments: Attachment[];
 };
+
 
 const PostPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,8 +35,12 @@ const PostPage = () => {
       <ReactMarkdown>{post.contentMarkdown}</ReactMarkdown>
       <h3>Вложения:</h3>
       <ul>
-        {post.attachments.map((url, i) => (
-          <li key={i}><a href={url} target="_blank" rel="noopener noreferrer">{url}</a></li>
+        {post.attachments.map((att, i) => (
+          <li key={i}>
+            <a href={att.url} target="_blank" rel="noopener noreferrer">
+              {att.fileName}
+            </a>
+          </li>
         ))}
       </ul>
     </div>
